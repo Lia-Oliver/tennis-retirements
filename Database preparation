@@ -1,0 +1,85 @@
+# Import data bases
+atpmatches<-read.csv("atp_matches.csv", header = TRUE, sep = ",")
+wtamatches<-read.csv("wtamatches.csv", header = TRUE, sep = ",")
+
+str(atpmatches)
+str(wtamatches)
+
+# We create a new database "ATP" with the variables of interest
+ATP<-atpmatches[, c("tourney_level", "surface", "winner_hand", "loser_hand", "winner_age", "loser_age", "winner_rank", "loser_rank", "winner_name", "loser_name", "best_of", "round", "Retirement", "year", "W1", "W2", "W3", "W4", "W5", "L1", "L2", "L3", "L4", "L5")]
+
+# Repeat the procedure for "WTA"
+WTA<-wtamatches[, c("tourney_level", "surface", "winner_hand", "loser_hand", "winner_age", "loser_age", "winner_rank", "loser_rank", "winner_name", "loser_name", "best_of", "round", "Retirement", "year", "W1", "W2", "W3", "L1", "L2", "L3")]
+
+ATP$tour<-"ATP"
+WTA$tour<-"WTA"
+ATP$dif_age<-ATP$winner_age-ATP$loser_age
+WTA$dif_age<-WTA$winner_age-WTA$loser_age
+
+ATP$dif_rank<-ATP$winner_rank-ATP$loser_rank
+WTA$dif_rank<-WTA$winner_rank-WTA$loser_rank
+
+library(dplyr)
+
+# ATP selection of elite tourney_levels
+newATP<-ATP[ATP$tourney_level %in% c("250 or 500", "Tour Finals", "Masters", "Grand Slams"),]
+
+# WTA selection of elite tourney_levels
+newWTA<-WTA[WTA$tourney_level %in% c("Premier", "Premier Mandatory", "Grand Slams"),]
+
+# Transform "tourney_level" into a factor and remove the levels we are not interested in for ATP and WTA
+# ATP
+newATP$tourney_level<-factor(newATP$tourney_level)
+newATP$tourney_level<-droplevels(newATP$tourney_level)
+levels(newATP$tourney_level)
+
+# WTA
+newWTA$tourney_level<-factor(newWTA$tourney_level)
+newWTA$tourney_level<-droplevels(newWTA$tourney_level)
+levels(newWTA$tourney_level)
+
+# Transform "round" into a factor and remove the levels we are not interested in and group the rounds into 3 different groups: Qualifying, Preliminary or Finals
+table(newATP$round)
+ATP<-newATP[newATP$round %in% c("R128", "R64", "R32", "R16", "QF", "RR", "SF", "F", "Q1", "Q2", "Q3"),]
+ATP$round<-factor(ATP$round)
+ATP$round<-droplevels(ATP$round)
+table(ATP$round)
+ATP$round<-factor(ATP$round,
+                  labels = c("Final", "Qualifying", "Qualifying", "Qualifying", "Final", "Preliminary", "Preliminary", "Preliminary", "Preliminary", "Preliminary", "Final"))
+table(ATP$round)
+
+# WTA
+table(newWTA$round)
+WTA<-newWTA[newWTA$round %in% c("R128", "R64", "R32", "R16", "QF", "RR", "SF", "F", "Q1", "Q2", "Q3", "Q4"),]
+WTA$round<-factor(WTA$round)
+WTA$round<-droplevels(WTA$round)
+table(WTA$round)
+WTA$round<-factor(WTA$round,
+                  labels = c("Final", "Qualifying", "Qualifying", "Qualifying", "Qualifying", "Final", "Preliminary", "Preliminary", "Preliminary", "Preliminary", "Preliminary", "Final"))
+table(WTA$round)
+
+# We select the range of years of interest for the study
+ATP<-ATP[ATP$year>="1973" & ATP$year<="2019",]
+summary(ATP$year)
+WTA<-WTA[WTA$year>="1975" & WTA$year<="2019",]
+summary(WTA$year)
+
+# Adding a new variable called `games`:
+
+ATP$games <- rowSums(ATP[,c("W1", "W2", "W3", "W4", "W5", "L1", "L2", "L3", "L4", "L5")], na.rm=TRUE)
+head(ATP$games)
+summary(ATP$games)
+
+WTA$games <- rowSums(WTA[,c("W1", "W2", "W3", "L1", "L2", "L3")], na.rm=TRUE)
+head(WTA$games)
+summary(WTA$games)
+
+# Remove the variables we used to create the `games' variable as they not longer interest us
+
+ATP[ ,c("W1", "W2", "W3", "W4", "W5", "L1", "L2", "L3", "L4", "L5")]<-list(NULL)
+WTA[ ,c("W1", "W2", "W3", "L1", "L2", "L3")]<-list(NULL)
+
+# Variable name change from "best_of" to "sets"
+
+ATP<-rename(ATP, sets = best_of)
+WTA<-rename(WTA, sets = best_of)
