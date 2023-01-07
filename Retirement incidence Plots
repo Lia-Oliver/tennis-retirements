@@ -1,0 +1,76 @@
+# Men's Incidence/Match Percentage Chart (ATP)
+# Match incidence
+retirsATP<-filter(ATP, Retirement==TRUE)
+retirs_any<-group_by(retirsATP, year) %>%
+  summarise(retirs_any = n())
+retirs_any$incidencia<-retirs_any$retirs_any/nrow(ATP)*100
+library(ggplot2)
+ggplot(retirs_any, aes(x=year, y=incidencia))+geom_line()
+
+# Incidence per sets
+retirs_any$incidenciasets<-retirs_any$retirs_any/sum(ATP$sets)*1000
+ggplot(retirs_any, aes(x=year, y=incidenciasets))+geom_line()
+
+# Incidence per games
+retirs_any$incidenciagames<-retirs_any$retirs_any/sum(ATP$games)*1000
+ggplot(retirs_any, aes(x=year, y=incidenciagames))+geom_line()
+
+# Women's Incidence/Match Percentage Chart (WTA)
+# Match Incidence
+retirsWTA<-filter(WTA, Retirement==TRUE)
+WTAretirs_any<-group_by(retirsWTA, year) %>%
+  summarise(retirs_any = n())
+WTAretirs_any$incidencia<-WTAretirs_any$retirs_any/nrow(WTA)*100
+ggplot(WTAretirs_any, aes(x=year, y=incidencia))+geom_line()
+
+# Incidence per sets
+WTAretirs_any$incidenciasets<-WTAretirs_any$retirs_any/sum(WTA$sets)*1000
+ggplot(retirs_any, aes(x=year, y=incidenciasets))+geom_line()
+
+# Incidence per games
+WTAretirs_any$incidenciagames<-WTAretirs_any$retirs_any/sum(WTA$games)*1000
+ggplot(retirs_any, aes(x=year, y=incidenciagames))+geom_line()
+
+# Chart Percentage incidence/match with Men (ATP) and Women (WTA) at the same time:
+retirs<-rbind(retirs_any, WTAretirs_any)
+
+retirs %>%
+  filter(!is.na(incidencia)) %>%
+  ggplot(aes(y = incidencia, x = year, colour = tour)) + 
+  stat_summary(fun.data = "mean_se", geom = "pointrange") + 
+  scale_colour_tableau(name = "") + 
+  scale_color_manual(values=c("#080279","#01EEFE"))+
+  theme_gdocs() + theme(legend.position = "bottom", legend.direction = "horizontal") + 
+  scale_y_continuous("Retirement Incidence", breaks = scales::pretty_breaks(n = 10)) + 
+  scale_x_continuous("Year", breaks = scales::pretty_breaks(n = 10)) + 
+  geom_line(size=1)+
+  ggtitle("Retirement Percentage Among Years")
+
+# Sets incidence
+retirs %>%
+  filter(!is.na(incidenciasets)) %>%
+  ggplot(aes(y = incidenciasets, x = year, colour = tour)) + 
+  stat_summary(fun.data = "mean_se", geom = "pointrange") + 
+  scale_colour_tableau(name = "") + 
+  scale_color_manual(values=c("#080279","#01EEFE"))+
+  theme_gdocs() + theme(legend.position = "bottom", legend.direction = "horizontal") + 
+  scale_y_continuous("Retirement Incidence/1000 sets", breaks = scales::pretty_breaks(n = 10)) + 
+  scale_x_continuous("Year", breaks = scales::pretty_breaks(n = 10)) + 
+  geom_line(size=1)+
+  ggtitle("Retirement Incidence Rates per 1000 Sets Among Years")
+
+# Games incidence
+retirs %>%
+  filter(!is.na(incidenciagames)) %>%
+  ggplot(aes(y = incidenciagames, x = year, colour = tour)) + 
+  stat_summary(fun.data = "mean_se", geom = "pointrange") + 
+  scale_colour_tableau(name = "") + 
+  scale_color_manual(values=c("#080279","#01EEFE"))+
+  theme_gdocs() + theme(legend.position = "bottom", legend.direction = "horizontal") + 
+  scale_y_continuous("Retirement Incidence/1000 games", breaks = scales::pretty_breaks(n = 10)) + 
+  scale_x_continuous("Year", breaks = scales::pretty_breaks(n = 10)) + 
+  geom_line(size=1)+
+  ggtitle("Retirement Incidence Rates per 1000 Games Among Years")
+  
+  
+
