@@ -72,5 +72,3 @@ retirs %>%
   geom_line(size=1)+
   ggtitle("Retirement Incidence Rates per 1000 Games Among Years")
   
-  
-
