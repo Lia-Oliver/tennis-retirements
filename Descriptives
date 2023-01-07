@@ -1,0 +1,148 @@
+#Transform variable "Retirement" into a factor
+ATP$Retirement<-factor(ATP$Retirement, levels = c("TRUE", "FALSE"), labels = c("YES", "NO"))
+WTA$Retirement<-factor(WTA$Retirement, levels = c("TRUE", "FALSE"), labels = c("YES", "NO"))
+ATP$dif_age<-as.numeric(ATP$dif_age)
+
+# How many Retirements do we have for ATP database?
+knitr::kable(as.data.frame(table(ATP$Retirement)),
+      col.names= c("Retirements", "Number"),
+      align= "cc")
+prop.table(table(ATP$Retirement))
+
+# How many Retirements do we have for WTA database?
+knitr::kable(as.data.frame(table(WTA$Retirement)),
+      col.names= c("Retirements", "Number"),
+      align= "cc")
+prop.table(table(WTA$Retirement))
+
+library(compareGroups)
+
+(ATPtab<-descrTable(Retirement~tourney_level+surface+winner_hand+loser_hand+dif_age+dif_rank+round, ATP))
+(WTAtab<-descrTable(Retirement~tourney_level+surface+winner_hand+loser_hand+dif_age+dif_rank+round, WTA))
+
+(res<-compareGroups(Retirement~tourney_level+surface+round+winner_hand+loser_hand+winner_age+loser_age+winner_rank+loser_rank, data = ATP))
+(restab<-createTable(res, digits = 2, type = 1, show.n = TRUE))
+
+
+(WTAres<-compareGroups(Retirement~tourney_level+surface+round+winner_hand+loser_hand+winner_age+loser_age+winner_rank+loser_rank, data = WTA))
+(WTArestab<-createTable(WTAres, digits = 2, type = 1, show.n = TRUE))
+
+# Descriptive analysis for categorical variables and Plots
+# ATP
+library("SmartEDA")
+ExpCustomStat(ATP,Cvar=c("tourney_level","Retirement"),gpby=TRUE,filt=NULL)
+retTourney<-table(ATP$Retirement, ATP$tourney_level)
+barplot(prop.table(retTourney, 2),
+        legend = c("No Retirement", "Retirement"),
+        args.legend = list(x = "bottomright"),
+        col = c("#080279","#01EEFE"),
+        ylab = "Retirement proportion",
+        xlab = "Tourney Level")
+round(prop.table(retTourney)*100, 4)
+
+ExpCustomStat(ATP,Cvar=c("surface","Retirement"),gpby=TRUE,filt=NULL)
+retSurface<-table(ATP$Retirement, ATP$surface)
+barplot(prop.table(retSurface, 2),
+        legend = c("No Retirement", "Retirement"),
+        args.legend = list(x = "bottomright"),
+        col = c("#080279","#01EEFE"),
+        ylab = "Retirement proportion",
+        xlab = "Surface")
+round(prop.table(retSurface)*100, 4)
+
+ExpCustomStat(ATP,Cvar=c("round","Retirement"),gpby=TRUE,filt=NULL)
+retRound<-table(ATP$Retirement, ATP$round)
+barplot(prop.table(retRound, 2),
+        legend = c("No Retirement", "Retirement"),
+        args.legend = list(x = "bottomright"),
+        col = c("#080279","#01EEFE"),
+        ylab = "Retirement proportion",
+        xlab = "Round")
+round(prop.table(retRound)*100, 4)
+
+ExpCustomStat(ATP,Cvar=c("winner_hand","Retirement"),gpby=TRUE,filt=NULL)
+retWinhand<-table(ATP$Retirement, ATP$winner_hand)
+barplot(prop.table(retWinhand, 2),
+        legend = c("No Retirement", "Retirement"),
+        args.legend = list(x = "bottomright"),
+        col = c("#87BDA4","#F39FA6"),
+        ylab = "Retirement proportion",
+        xlab = "Winner Hand")
+round(prop.table(retWinhand)*100, 4)
+
+ExpCustomStat(ATP,Cvar=c("loser_hand","Retirement"),gpby=TRUE,filt=NULL)
+retLoshand<-table(ATP$Retirement, ATP$loser_hand)
+barplot(prop.table(retLoshand, 2),
+        legend = c("No Retirement", "Retirement"),
+        args.legend = list(x = "bottomright"),
+        col = c("#87BDA4","#F39FA6"),
+        ylab = "Retirement proportion",
+        xlab = "Loser Hand")
+round(prop.table(retLoshand)*100, 4)
+retLoshand
+
+# WTA
+ExpCustomStat(WTA,Cvar=c("tourney_level","Retirement"),gpby=TRUE,filt=NULL)
+WretTourney<-table(WTA$Retirement, WTA$tourney_level)
+barplot(prop.table(WretTourney, 2),
+        legend = c("No Retirement", "Retirement"),
+        args.legend = list(x = "bottomright"),
+        col = c("#080279","#01EEFE"),
+        ylab = "Retirement proportion",
+        xlab = "Tourney Level")
+round(prop.table(WretTourney)*100, 4)
+
+ExpCustomStat(WTA,Cvar=c("surface","Retirement"),gpby=TRUE,filt=NULL)
+WretSurface<-table(WTA$Retirement, WTA$surface)
+barplot(prop.table(WretSurface, 2),
+        legend = c("No Retirement", "Retirement"),
+        args.legend = list(x = "bottomright"),
+        col = c("#080279","#01EEFE"),
+        ylab = "Retirement proportion",
+        xlab = "Surface")
+round(prop.table(WretSurface)*100, 4)
+
+ExpCustomStat(WTA,Cvar=c("round","Retirement"),gpby=TRUE,filt=NULL)
+WretRound<-table(WTA$Retirement, WTA$round)
+barplot(prop.table(WretRound, 2),
+        legend = c("No Retirement", "Retirement"),
+        args.legend = list(x = "bottomright"),
+        col = c("#080279","#01EEFE"),
+        ylab = "Retirement proportion",
+        xlab = "Round")
+round(prop.table(WretRound)*100, 4)
+
+ExpCustomStat(WTA,Cvar=c("winner_hand","Retirement"),gpby=TRUE,filt=NULL)
+WretWinhand<-table(WTA$Retirement, WTA$winner_hand)
+barplot(prop.table(WretWinhand, 2),
+        legend = c("No Retirement", "Retirement"),
+        args.legend = list(x = "bottomright"),
+        col = c("#87BDA4","#F39FA6"),
+        ylab = "Retirement proportion",
+        xlab = "Winner Hand")
+round(prop.table(WretWinhand)*100, 4)
+
+ExpCustomStat(WTA,Cvar=c("loser_hand","Retirement"),gpby=TRUE,filt=NULL)
+WretLoshand<-table(WTA$Retirement, WTA$loser_hand)
+barplot(prop.table(WretLoshand, 2),
+        legend = c("No Retirement", "Retirement"),
+        args.legend = list(x = "bottomright"),
+        col = c("#87BDA4","#F39FA6"),
+        ylab = "Retirement proportion",
+        xlab = "Loser Hand")
+round(prop.table(WretLoshand)*100, 4)
+
+# ATP plots for numerical variables
+boxplot(ATP$winner_age~ATP$Retirement, ylab = "Winner age", xlab = "Retirement", col = c("#87BDA4","#F39FA6"))
+boxplot(ATP$loser_age~ATP$Retirement, ylab = "Loser age", xlab = "Retirement", col = c("#87BDA4","#F39FA6"))
+boxplot(ATP$winner_rank~ATP$Retirement, ylab = "Winner rank", xlab = "Retirement", col = c("#87BDA4","#F39FA6"))
+boxplot(ATP$loser_rank~ATP$Retirement, ylab = "Loser rank", xlab = "Retirement", col = c("#87BDA4","#F39FA6"))
+boxplot(ATP$score~ATP$Retirement, ylab = "Score", xlab = "Retirement", col = c("#87BDA4","#F39FA6"))
+
+# WTA plots for numerical variables
+boxplot(WTA$winner_age~WTA$Retirement, ylab = "Winner age", xlab = "Retirement", col = c("#87BDA4","#F39FA6"))
+boxplot(WTA$loser_age~WTA$Retirement, ylab = "Loser age", xlab = "Retirement", col = c("#87BDA4","#F39FA6"))
+boxplot(WTA$winner_rank~WTA$Retirement, ylab = "Winner rank", xlab = "Retirement", col = c("#87BDA4","#F39FA6"))
+boxplot(WTA$loser_rank~WTA$Retirement, ylab = "Loser rank", xlab = "Retirement", col = c("#87BDA4","#F39FA6"))
+boxplot(WTA$score~WTA$Retirement, ylab = "Score", xlab = "Retirement", col = c("#87BDA4","#F39FA6"))
+```
