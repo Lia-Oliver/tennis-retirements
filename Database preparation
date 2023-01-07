@@ -2,6 +2,7 @@
 atpmatches<-read.csv("atp_matches.csv", header = TRUE, sep = ",")
 wtamatches<-read.csv("wtamatches.csv", header = TRUE, sep = ",")
 
+# General look to the data bases, variables and observations
 str(atpmatches)
 str(wtamatches)
 
