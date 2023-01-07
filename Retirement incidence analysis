@@ -129,6 +129,7 @@ epi.2by2(dat = Quali_Preli, method = "cohort.time", digits = 2,
 conf.level = 0.95, units = 1000, interpret = FALSE, outcome = "as.columns")
 
 
+
 # WTA
 # TOURNEY_LEVEL (SETS)
 ExpCustomStat(WTA,Cvar=c("tourney_level","Retirement"),gpby=TRUE,filt=NULL)
