@@ -1,4 +1,5 @@
-
+# GENERALIZED LINEAR MODELS
+# REGRESSION ANALYSIS
 
 ATP$games <- rowSums(ATP[,c("W1", "W2", "W3", "W4", "W5", "L1", "L2", "L3", "L4", "L5")], na.rm=TRUE)
 WTA$games <- rowSums(WTA[,c("W1", "W2", "W3", "L1", "L2", "L3")], na.rm=TRUE)
