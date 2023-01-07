@@ -1,0 +1,71 @@
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggthemes)
+library(scales)
+
+# AGE ANALYSIS
+
+atp_age <- ATP %>%
+  select(year, winner_age, loser_age) %>%
+  gather("player", "age", winner_age, loser_age)
+
+wta_age <- WTA %>%
+  select(year, winner_age, loser_age) %>%
+  gather("player", "age", winner_age, loser_age)
+
+atp_age$tour <- "ATP"
+wta_age$tour <- "WTA"
+
+ages <- rbind(atp_age, wta_age)
+
+ages %>%
+  filter(!is.na(age)) %>%
+  ggplot(aes(y = age, x = year, colour = tour)) + 
+  stat_summary(fun.data = "median_hilow", geom = "pointrange") + 
+  scale_colour_tableau(name = "") + 
+  scale_color_manual(values=c("#080279","#01EEFE"))+
+  theme_gdocs() + theme(legend.position = "bottom", legend.direction = "horizontal") + 
+  scale_y_continuous("Median Age", breaks = scales::pretty_breaks(n = 10)) + 
+  scale_x_continuous("Year", breaks = scales::pretty_breaks(n = 10)) + 
+  geom_line(size=1) +
+  ggtitle("Aging Among Years")
+
+summary(atp_age)
+
+summary(wta_age)
+
+# DIF-AGE ANALYSIS
+
+mean_difage<-aggregate(dif_age~year, data = ATP, mean)
+ggplot(data = mean_difage, aes(x=year, y=dif_age))+geom_line()
+WTAmean_difage<-aggregate(dif_age~year, data = WTA, mean)
+ggplot(data = WTAmean_difage, aes(x=year, y=dif_age))+geom_line()
+
+dif_age <- rbind(ATP, WTA)
+mean_difage <- aggregate(dif_age ~ year + tour, data = dif_age, mean)
+ggplot(data = mean_difage, aes(x = year, y = dif_age, color = tour)) +
+  scale_color_manual(values=c("#080279","#01EEFE"))+
+  geom_line()+
+  geom_line(size=1) +
+  theme_bw()+
+  ggtitle("Difference Age between players among Years")
+
+# DIF_RANK ANALYSIS
+mean_difrank <- aggregate(dif_rank ~ year + tour, data = dif_age, mean)
+ggplot(data = mean_difrank, aes(x = year, y = dif_rank, color = tour)) +
+  scale_color_manual(values=c("#080279","#01EEFE"))+
+  geom_line()+
+  geom_line(size=1) +
+  theme_bw()+
+  ggtitle("Difference Ranking between players among Years")
+
+# LOAD ANALYSIS
+partits_per_any<-partits %>% group_by(year, tour) %>% summarise(n = n())
+
+ggplot(data = partits_per_any, aes(x = year, y = n, color = tour)) +
+  scale_color_manual(values=c("#080279","#01EEFE"))+
+  geom_line()+
+  geom_line(size=1) +    
+  theme_bw()+
+  ggtitle("Number of matches among Years")
