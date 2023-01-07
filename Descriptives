@@ -145,4 +145,3 @@ boxplot(WTA$loser_age~WTA$Retirement, ylab = "Loser age", xlab = "Retirement", c
 boxplot(WTA$winner_rank~WTA$Retirement, ylab = "Winner rank", xlab = "Retirement", col = c("#87BDA4","#F39FA6"))
 boxplot(WTA$loser_rank~WTA$Retirement, ylab = "Loser rank", xlab = "Retirement", col = c("#87BDA4","#F39FA6"))
 boxplot(WTA$score~WTA$Retirement, ylab = "Score", xlab = "Retirement", col = c("#87BDA4","#F39FA6"))
-```
