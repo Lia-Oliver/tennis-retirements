@@ -1,0 +1,14 @@
+colSums(is.na(ATP))
+colSums(is.na(WTA))
+
+library(DataExplorer)
+(missingATP<-plot_missing(ATP))
+(missingWTA<-plot_missing(WTA))
+
+library(Amelia)
+missmap(WTA)
+missmap(ATP)
+
+library(naniar)
+gg_miss_fct(WTA, year)
+gg_miss_fct(ATP, year)
