@@ -1,14 +1,11 @@
-```{r}
-
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(ggthemes)
 library(scales)
-```
+
 # AGE ANALYSIS
 
-```{r}
 atp_age <- ATP %>%
   select(year, winner_age, loser_age) %>%
   gather("player", "age", winner_age, loser_age)
@@ -72,4 +69,3 @@ ggplot(data = partits_per_any, aes(x = year, y = n, color = tour)) +
   geom_line(size=1) +    
   theme_bw()+
   ggtitle("Number of matches among Years")
-```
