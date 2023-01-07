@@ -1,0 +1,112 @@
+
+
+ATP$games <- rowSums(ATP[,c("W1", "W2", "W3", "W4", "W5", "L1", "L2", "L3", "L4", "L5")], na.rm=TRUE)
+WTA$games <- rowSums(WTA[,c("W1", "W2", "W3", "L1", "L2", "L3")], na.rm=TRUE)
+
+ATP$games<-ATP$games+1
+WTA$games<-WTA$games+1
+
+# TOUR INTERACTIONS
+# Tour vs. Surface Interaction
+intSurface<-glm(Retirement~tour*surface, family = "binomial", data = tennis)
+summary(intSurface)
+
+# Tour vs. Round Interaction
+intRound<-glm(Retirement~tour*round, family = "binomial", data = tennis)
+summary(intRound)
+
+# Tour vs. Score Interaction
+intSets<-glm(Retirement~tour*sets, family = "binomial", data = tennis)
+summary(intSets)
+
+# All results are significant, let's visually confirm them with plots
+
+# INTERACTION PLOTS
+
+# Plot interaction tour*Surface
+interaction.plot(x.factor = tennis$surface, 
+                 trace.factor = tennis$tour, 
+                 response = tennis$Retirement, 
+                 xlab="Surface",
+                 ylab="Retirement", trace.label="Tour",
+                 col = c("#01EEFE", "#080279"),
+                 lwd = 3)
+
+# Plot interaction tour*score
+interaction.plot(x.factor = tennis$sets, 
+                 trace.factor = tennis$tour, 
+                 response = tennis$Retirement, 
+                 xlab="Sets",
+                 ylab="Retirement", trace.label="Tour", 
+                 col = c("#080279","#01EEFE"),
+                 lwd = 3)
+
+# Plot interaction tour*round
+interaction.plot(x.factor = tennis$round, 
+                 trace.factor = tennis$tour, 
+                 response = tennis$Retirement, 
+                 xlab="Round",
+                 ylab="Retirement", trace.label="Tour", 
+                 col = c("#01EEFE", "#080279"),
+                 lwd = 3)
+                 
+# REGRESSION MODEL FOR ATP
+model0<-glm(formula = Retirement ~ surface + round + tourney_level+dif_rank+dif_age, offset=log(games), family = "binomial", data = ATP)
+summary(model0)
+anova(model0,test="Chi")
+model0$aic
+
+# REGRESSION MODEL FOR WTA
+WTAmod0<-glm(formula = Retirement ~ surface + round + tourney_level + dif_age + dif_rank, offset=log(games), family = "binomial", data = WTA)
+summary(WTAmod0)
+anova(WTAmod0, test = "Chi")
+WTAmod0$aic
+
+# MODEL DIAGNOSTICS
+library(faraway)
+library(car)
+
+halfnorm(rstudent(model0))
+halfnorm(rstudent(WTAmod0))
+
+ATPinf<-influence(model0)
+sum(ATPinf$hat)
+halfnorm(ATPinf$hat)
+influencePlot(model0, main="Influence Plot for ATP", sub = "The size of the circle is proportional to the Cook's distance")
+
+WTAinf<-influence(WTAmod0)
+sum(WTAinf$hat)
+halfnorm(WTAinf$hat)
+influencePlot(WTAmod0, main="Influence Plot for WTA", sub = "The size of the circle is proportional to the Cook's distance")
+
+cook<-cooks.distance(model0)
+which.max(cook)
+
+halfnorm(cooks.distance(model0), labs = row.names(ATP), ylab = "Cook Distance")
+
+atpmodnul<-glm(formula = Retirement ~ 1, offset=log(games), family = "binomial", data = ATP)
+model0<-glm(formula = Retirement ~ surface + round + tourney_level+dif_rank+dif_age, offset=log(games), family = "binomial", data = ATP)
+
+library(pscl)
+DescTools::PseudoR2(model0, which = "all")
+
+#pseudo R2 McFadden
+1-(logLik(model0)/logLik(atpmodnul))
+pR2(ATPmod)
+
+# pseudo R2
+(pseudoR2<-(model0$null.deviance-model0$deviance)/model0$null.deviance)
+
+
+WTAmod0<-glm(formula = Retirement ~ surface + round + tourney_level + dif_age + dif_rank, offset=log(games), family = "binomial", data = WTA)
+
+DescTools::PseudoR2(WTAmod0, which = "all")
+
+#pseudo R2 McFadden
+wtamodnul<-glm(formula = Retirement ~ 1, offset=log(games), family = "binomial", data = WTA)
+
+1-(logLik(WTAmod0)/logLik(wtamodnul))
+pR2(WTAmod)
+
+# pseudo R2
+(pseudoR22<-(WTAmod0$null.deviance-WTAmod0$deviance)/WTAmod0$null.deviance)
